@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import messagebox, Toplevel
+from PIL import Image, ImageTk
 
 class VendingMachineApp:
     def __init__(self, root):
@@ -8,12 +9,12 @@ class VendingMachineApp:
         self.root.title("Vending Machine")
 
         self.total_price = 0
-        self.cart = {}  # Cart will store {item_name: (price, quantity)}
+        self.cart = {}
         self.selected_item = None
         self.selected_price = 0
 
         self.items = {
-            "Soda": (1.5, 10),
+           "Soda": (1.5, 10),
             "Chips": (2.0, 8),
             "Candy": (1.0, 15),
             "Water": (1.2, 20),
@@ -50,35 +51,53 @@ class VendingMachineApp:
         self.create_widgets()
 
     def center_window(self, width, height):
-            screen_width = self.root.winfo_screenwidth()
-            screen_height = self.root.winfo_screenheight()
-            position_top = int(screen_height / 2 - height / 2)
-            position_right = int(screen_width / 2 - width / 2)
-            self.root.geometry(f"{width}x{height}+{position_right}+{position_top}")
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        position_top = int(screen_height / 2 - height / 2)
+        position_right = int(screen_width / 2 - width / 2)
+        self.root.geometry(f"{width}x{height}+{position_right}+{position_top}")
 
     def create_widgets(self):
-        header_label = ctk.CTkLabel(self.root, text="               Welcome to The Vending Machine", font=("Arial", 40, "bold"))
+        header_label = ctk.CTkLabel(self.root, text="Welcome to The Vending Machine", font=("Arial", 40, "bold"))
         header_label.grid(row=0, column=0, columnspan=2, pady=10)
 
-        # Create a frame for the item buttons (4x8 grid)
-        items_frame = ctk.CTkFrame(self.root, width=400, height=400)  # Width and height in pixels
+        # Create a frame for the item buttons
+        items_frame = ctk.CTkFrame(self.root, width=400, height=400)
         items_frame.grid(row=1, column=0, pady=10, padx=20, sticky="nsew")
 
-        # Configure columns in items_frame to have equal weight
+        # Configure grid layout for items_frame
         for col in range(4):  # 4 columns
-            items_frame.grid_columnconfigure(col, weight=1, uniform="equal")  # Make columns equally sized
+            items_frame.grid_columnconfigure(col, weight=1, uniform="equal")
 
-        # Create buttons for items
-        row = 0
-        col = 0
+        # Add image for "Soda" button
+        
+            img_path = r"C:\Users\HpZBOOK\Desktop\Python\can.png"  # Update with your Soda image path
+            soda_image = Image.open(img_path).resize((100, 100))  # Resize the image as needed
+            soda_photo = ImageTk.PhotoImage(soda_image)
+
+            soda_button = ctk.CTkButton(
+                items_frame,
+                text="",  # No text
+                image=soda_photo,
+                command=lambda: self.select_item("Soda", self.items["Soda"][0]),
+                width=100, height=100
+            )
+            soda_button.image = soda_photo  # Keep a reference to avoid garbage collection
+            soda_button.grid(row=0, column=0, padx=5, pady=10, sticky="ew")
+       
+        # Add remaining buttons
+        row, col = 0, 1
         for item, (price, _) in self.items.items():
+            if item == "Soda":
+                continue  # Skip the Soda button since it already has an image
+
             button = ctk.CTkButton(
                 items_frame,
                 text=f"{item}\n${price}",
                 command=lambda item=item, price=price: self.select_item(item, price),
                 font=("Arial", 20), width=20, height=15
             )
-            button.grid(row=row, column=col, padx=5, pady=10, sticky="ew")  # Use sticky="ew" to make buttons stretch horizontally
+            button.grid(row=row, column=col, padx=5, pady=10, sticky="ew")
             col += 1
             if col >= 4:  # Move to the next row after 4 columns
                 col = 0
@@ -123,7 +142,6 @@ class VendingMachineApp:
         self.root.grid_columnconfigure(0, weight=1)  # Column 0 for items_frame
         self.root.grid_columnconfigure(1, weight=1)  # Column 1 for cart_frame
         self.root.grid_columnconfigure(2, weight=1)  # Column 2 for selected_items_frame
-
     def select_item(self, item, price):
         self.selected_item = item
         self.selected_price = price
@@ -182,15 +200,18 @@ class VendingMachineApp:
             reject_button.pack(side="right", padx=20, pady=10)
 
     def complete_purchase(self):
-        messagebox.showinfo("Purchase Complete", f"Your total is ${self.total_price:.2f}\nThank you for your purchase!")
+        messagebox.showinfo("Purchase Completed", "Thank you for your purchase!")
         self.reset()
 
     def reset(self):
-        self.cart.clear()
+        self.cart = {}
         self.total_price = 0
         self.selected_item = None
         self.selected_price = 0
         self.selected_items_list.configure(text="")
+        self.slider_label.configure(text="Select Quantity: 0")
+        self.quantity_slider.set(0)
+
 
 if __name__ == "__main__":
     root = ctk.CTk()
