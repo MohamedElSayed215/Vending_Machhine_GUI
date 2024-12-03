@@ -65,7 +65,7 @@ class VendingMachineApp:
 
         # Create a frame for the item buttons (4x8 grid)
         items_frame = ctk.CTkFrame(self.root, width=400, height=400)
-        items_frame.grid(row=1, column=0, pady=10, padx=20, sticky="nsew")
+        items_frame.grid(row=1, column=0, pady=3, padx=20, sticky="nsew")
 
         # Configure columns in items_frame to have equal weight
         for col in range(4):  # 4 columns
@@ -82,7 +82,7 @@ class VendingMachineApp:
                 command=lambda item=item, price=price: self.select_item(item, price),
                 font=("Arial", 20), width=20, height=15
             )
-            button.grid(row=row, column=col, padx=5, pady=10, sticky="ew")
+            button.grid(row=row, column=col, padx=5, pady=7, sticky="ew")
             self.item_buttons[item] = button
             col += 1
             if col >= 4:
